@@ -20,6 +20,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -33,25 +34,27 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.campusdigitalfp.filmotecav2.model.Film
-import com.campusdigitalfp.filmotecav2.model.FilmDataSource
 import com.campusdigitalfp.filmotecav2.R
 import com.campusdigitalfp.filmotecav2.common.FilmTopAppBar
-import com.campusdigitalfp.filmotecav2.model.FilmDataSource.films
+import com.campusdigitalfp.filmotecav2.viewmodel.FilmViewModel
 
 @Composable
-fun FilmListScreen(navController: NavHostController) {
+fun FilmListScreen(navController: NavHostController, viewModel: FilmViewModel) {
     var isActionMode by remember { mutableStateOf(false) }
     val selectedFilms = remember { mutableStateListOf<Film>() }
+    val films by viewModel.films.collectAsState()
 
     Scaffold(modifier = Modifier.fillMaxSize(), topBar = {
         FilmTopAppBar(navController,
             principal = true,
             editar = false,
             selectedFilms = selectedFilms,
+            viewModel = viewModel,
             isActionMode = isActionMode
         ) {
             isActionMode = it
         }
+
     }) { innerPadding ->
         FilmListContent(
             films = films,
@@ -65,7 +68,7 @@ fun FilmListScreen(navController: NavHostController) {
 
 @Composable
 fun FilmListContent(
-    films: MutableList<Film>,
+    films: List<Film>,
     selectedFilms: MutableList<Film>,
     isActionMode: Boolean,
     navController: NavHostController,
@@ -77,7 +80,7 @@ fun FilmListContent(
             .padding(innerPadding)
             .fillMaxSize()
     ) {
-        itemsIndexed(films) { index, film ->
+        itemsIndexed(films) { _, film ->
             VistaFilm(film = film, onClick = {
                 if (isActionMode) {
                     if (selectedFilms.contains(film)) {
@@ -89,7 +92,7 @@ fun FilmListContent(
                         selectedFilms.add(film)
                     }
                 } else {
-                    navController.navigate("data/$index")
+                    navController.navigate("data/${film.id}")
                 }
             }, onLongClick = {
                 selectedFilms.add(film)

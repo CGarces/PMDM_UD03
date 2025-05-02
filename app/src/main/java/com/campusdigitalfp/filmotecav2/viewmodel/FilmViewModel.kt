@@ -80,24 +80,28 @@ class FilmViewModel : ViewModel() {
     }
 
     /**
-     * Funcion temporal, se usa una unica vez para poder probar la conexion.
+     * Item de ejemplo con valores por defecto.
      */
     fun addExampleFilms() {
-        val films = listOf(
-            Film(
-                title = "Harry Potter y la piedra filosofal",
-                director = "Chris Columbus",
-                imageResId = R.drawable.harry_potter_y_la_piedra_filosofal,
-                comments = "Una aventura mágica en Hogwarts.",
-                format = Film.FORMAT_DVD,
-                genre = Film.GENRE_ACTION,
-                imdbUrl = "http://www.imdb.com/title/tt0241527",
-                year = 2001,
-            ),
+        val film =  Film(
+            title = "Película por defecto",
+            director = "Director Desconocido",
+            imageResId = R.drawable.icono_pelicula,
+            comments = "Esta es una película de ejemplo para la aplicación.",
+            format = Film.FORMAT_DVD,
+            genre = Film.GENRE_ACTION,
+            imdbUrl = "http://www.imdb.com",
+            year = 2025
         )
-
         viewModelScope.launch {
-            repository.addMultipleFilms(films) // Inserta todas de una vez.
+            repository.addFilm (film) // Inserta todas de una vez.
+        }
+    }
+
+    fun deleteSelectedFilms(selectedFilms: List<Film>) {
+        viewModelScope.launch {
+            repository.deleteMultipleFilms(selectedFilms)
+            fetchFilms() // Recarga la lista tras la eliminación.
         }
     }
 }

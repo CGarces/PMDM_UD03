@@ -26,7 +26,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.navigation.NavHostController
 import com.campusdigitalfp.filmotecav2.model.Film
 import com.campusdigitalfp.filmotecav2.R
-import com.campusdigitalfp.filmotecav2.model.FilmDataSource.films
+import com.campusdigitalfp.filmotecav2.viewmodel.FilmViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Composable
 fun Boton(onClick: () -> Unit, text: String, modifier: Modifier = Modifier){
@@ -43,6 +44,7 @@ fun FilmTopAppBar(
     editar: Boolean = false,
     selectedFilms: MutableList<Film> = mutableListOf(),
     isActionMode: Boolean = false,
+    viewModel:FilmViewModel = viewModel(),
     onActionModeChange: (Boolean) -> Unit = {}
 ) {
     TopAppBar(
@@ -84,7 +86,7 @@ fun FilmTopAppBar(
             if (principal) {
                 if (isActionMode) {
                     IconButton(onClick = {
-                        films.removeAll(selectedFilms)
+                        viewModel.deleteSelectedFilms(selectedFilms)
                         selectedFilms.clear()
                         onActionModeChange(false)
                     }) {
@@ -100,7 +102,7 @@ fun FilmTopAppBar(
 
 
 @Composable
-fun MenuDesplegable(navController: NavHostController) {
+fun MenuDesplegable(navController: NavHostController, viewModel: FilmViewModel = viewModel()) {
     var expanded by remember { mutableStateOf(false) }
 
     IconButton(onClick = { expanded = true }) {
@@ -115,21 +117,8 @@ fun MenuDesplegable(navController: NavHostController) {
         onDismissRequest = { expanded = false }
     ) {
         DropdownMenuItem(onClick = {
-            val defaultFilm = Film().apply {
-                id = films.size
-                title = "Película por defecto"
-                director = "Director Desconocido"
-                imageResId = R.drawable.icono_pelicula
-                comments = "Esta es una película de ejemplo para la aplicación."
-                format = Film.FORMAT_DVD
-                genre = Film.GENRE_ACTION
-                imdbUrl = "http://www.imdb.com"
-                year = 2024
-            }
-
-            films.add(defaultFilm)
-
             expanded = false
+            viewModel.addExampleFilms()
         }, text = { Text("Añadir película") })
         DropdownMenuItem(onClick = {
             navController.navigate("about")

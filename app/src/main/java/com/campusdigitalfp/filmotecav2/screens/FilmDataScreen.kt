@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -26,15 +28,18 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.SavedStateHandle
 import androidx.navigation.NavHostController
 import com.campusdigitalfp.filmotecav2.model.Film
-import com.campusdigitalfp.filmotecav2.model.FilmDataSource
 import com.campusdigitalfp.filmotecav2.R
 import com.campusdigitalfp.filmotecav2.common.FilmTopAppBar
+import com.campusdigitalfp.filmotecav2.viewmodel.FilmViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.runtime.collectAsState
 
 @Composable
-fun FilmDataScreen(navController: NavHostController, filmIndex: Int) {
+fun FilmDataScreen(navController: NavHostController, filmIndex: String, viewModel: FilmViewModel = viewModel() ) {
     val savedStateHandle = navController.currentBackStackEntry?.savedStateHandle ?: return
     ShowResultToast(savedStateHandle)
-    val film = FilmDataSource.films[filmIndex]
+    val films  by viewModel.films.collectAsState()
+    val film = films.find { it.id == filmIndex }
 
     Scaffold(modifier = Modifier.fillMaxSize(), topBar = {
         FilmTopAppBar(
@@ -44,11 +49,13 @@ fun FilmDataScreen(navController: NavHostController, filmIndex: Int) {
         Column(
             modifier = Modifier
                 .padding(innerPadding)
-                .fillMaxSize(),
+                .fillMaxSize().verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
         )
         {
-            VistaFilm(film)
+            if (film != null) {
+                VistaFilm(film)
+            }
             Box(modifier = Modifier.fillMaxWidth()) {
                 Row {
                     Button(
