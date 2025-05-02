@@ -1,7 +1,7 @@
 package com.campusdigitalfp.filmotecav2.model
 
 data class Film(
-    var id: Int = 0,
+    var id: String = "", // Identificador del documento en Firestore,
     var imageResId: Int = 0,
     var title: String? = null,
     var director: String? = null,
